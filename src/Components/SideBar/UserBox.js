@@ -5,7 +5,6 @@ import axios from "axios";
 
 function UserBox() {
   const { user } = useContext(userContext);
-  console.log("USERBOX USER", user);
 
   return (
     <div className="flex justify-between items-center mb-6 hover:bg-primary-light cursor-pointer rounded-full py-2 px-4 transform transition-colors duratios-200">

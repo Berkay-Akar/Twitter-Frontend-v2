@@ -5,10 +5,13 @@ import Divider from "./Divider";
 import FeedList from "../Tweet/FeedList";
 import { userContext } from "../../App";
 import axios from "axios";
+import FeedItem from "../Tweet/FeedItem";
 
 function Main() {
   const [posts, setPosts] = useState([]);
   const { user } = useContext(userContext);
+
+  console.log("POST: ", posts);
 
   useEffect(() => {
     fetchData();
@@ -20,20 +23,94 @@ function Main() {
         return;
       }
       const response = await axios.get("http://localhost:3001/posts", {
-        params: {
-          id: user.id,
-        },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log("RESPONSE:", response);
-      console.log("RESPONSE DATA:", response.data);
+      if (!response.data.posts.length) return;
       setPosts(response.data.posts);
-      console.log("FETCH USER", user);
-      console.log("USER ID:", user.id);
     } catch (error) {
-      console.log("Error fetching posts:", error.response.data.error);
+      console.log("Error fetching posts:", error);
+    }
+  };
+
+  const sendTweet = (tweet) => {
+    if (tweet.length === 0) {
+      return;
+    }
+    try {
+      axios
+        .post(
+          "http://localhost:3001/posts",
+          {
+            post_user: user.id,
+            post_text: tweet,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        )
+        .then((res) => {
+          console.log("RES DATA:", res.data.post);
+          setPosts([res.data.post, ...posts]);
+        });
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
+  };
+
+  const likePost = async (postId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3001/posts/likes`,
+        {
+          id: postId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("RESPONSE:", response.data);
+      if (!response.data) return;
+      const updatedPosts = posts.map((post) => {
+        if (post.post_id === postId) {
+          post = response.data.post;
+        }
+        return post;
+      });
+
+      console.log("UPDATED POSTS:", updatedPosts);
+      setPosts(updatedPosts);
+    } catch (error) {}
+  };
+
+  const deletePost = async (postId) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3001/posts`,
+        {
+          data: {
+            id: postId,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("RESPONSE:", response.data);
+      if (!response.data) return;
+      const updatedPosts = posts.filter((post) => {
+        return post.post_id !== postId;
+      });
+      setPosts(updatedPosts);
+    } catch (error) {
+      console.log("Error deleting post:", error);
     }
   };
 
@@ -49,10 +126,10 @@ function Main() {
           alt="Profile"
           className="w-11 h-11 rounded-full"
         />
-        <TweetBox />
+        <TweetBox sendTweet={sendTweet} />
       </div>
       <Divider />
-      <FeedList tweets={posts} />
+      <FeedList tweets={posts} likePost={likePost} deletePost={deletePost} />
     </main>
   );
 }

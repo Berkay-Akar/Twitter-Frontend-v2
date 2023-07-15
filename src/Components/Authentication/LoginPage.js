@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState, useContext } from "react";
 import axios from "axios";
 import { userContext } from "../../App";
 import { Route, useNavigate } from "react-router-dom";
 
 function LoginPage() {
+  const { user } = useContext(userContext);
+  console.log("USER:", user);
   const navigate = useNavigate();
 
   const { setUser } = useContext(userContext);
@@ -13,6 +15,11 @@ function LoginPage() {
     username: "",
     password: "",
   });
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({
