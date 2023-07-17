@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { userContext } from "../../App";
 
 export default function RegisterPage(props) {
+  const { user } = useContext(userContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -10,6 +12,12 @@ export default function RegisterPage(props) {
     password: "",
     password_confirmation: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({

@@ -1,11 +1,11 @@
+import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { WiStars } from "react-icons/wi";
-import TweetBox from "../Tweet/TweetBox";
-import Divider from "./Divider";
-import FeedList from "../Tweet/FeedList";
 import { userContext } from "../../App";
-import axios from "axios";
-import FeedItem from "../Tweet/FeedItem";
+import FeedList from "../Tweet/FeedList";
+import TweetBox from "../Tweet/TweetBox";
+import TweetDetail from "../Tweet/TweetDetail";
+import Divider from "./Divider";
 
 function Main() {
   const [posts, setPosts] = useState([]);

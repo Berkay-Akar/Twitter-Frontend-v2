@@ -1,16 +1,13 @@
 import React, { useContext } from "react";
-import { userContext } from "../../App";
 import { BiLike } from "react-icons/bi";
-import Comment from "../Comments/Comment";
-import CommentList from "../Comments/CommentList";
 import { BsTrash3 } from "react-icons/bs";
-import axios from "axios";
+import { userContext } from "../../App";
 
-function FeedItem({ tweet, likePost, deletePost }) {
+function FeedItem({ tweet, likePost, deletePost, comments }) {
   const { user } = useContext(userContext);
 
   return (
-    <div>
+    <a href={`/tweet/${tweet.username}/${tweet.post_id}`} rel="noreferrer">
       <article className="flex flex-col shadow my-4">
         <div className="flex items-center ">
           <img
@@ -42,11 +39,11 @@ function FeedItem({ tweet, likePost, deletePost }) {
         </div>
         {/* {comments.length > 0 ? (
           <CommentList comments={comments} posts={tweet} />
-        ) : null} */}
+        ) : null}
         <Comment />
-        {/* <CommentList /> */}
+        <CommentList /> */}
       </article>
-    </div>
+    </a>
   );
 }
 

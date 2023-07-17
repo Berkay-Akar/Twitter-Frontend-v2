@@ -1,7 +1,5 @@
-import { useContext, useEffect } from "react";
-import React from "react";
+import React, { useContext } from "react";
 import { userContext } from "../../App.js";
-import axios from "axios";
 
 function UserBox() {
   const { user } = useContext(userContext);
