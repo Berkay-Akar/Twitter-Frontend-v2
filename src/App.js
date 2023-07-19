@@ -4,6 +4,8 @@ import LoginPage from "./Components/Authentication/LoginPage";
 import RegisterPage from "./Components/Authentication/RegisterPage";
 import HomePage from "./Components/Main/HomePage";
 import TweetDetail from "./Components/Tweet/TweetDetail";
+import Profile from "./Components/Profile";
+
 export const userContext = React.createContext();
 
 function App() {
@@ -23,8 +25,9 @@ function App() {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
+    setUser(null);
   };
 
   return (
@@ -36,15 +39,20 @@ function App() {
     >
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<HomePage />} />
-          {username && (
-            <Route
-              path={`/tweet/${username}/:tweetId`}
-              element={<TweetDetail />}
-            />
-          )}
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/register" element={<RegisterPage />} />
+          <Route
+            path="/"
+            // element={
+            //   user ? <HomePage handleLogout={handleLogout} /> : <LoginPage />
+            // }
+            element={<HomePage handleLogout={handleLogout} />}
+          />
+          <Route path={`/tweet/:username/:tweetId`} element={<TweetDetail />} />
+          <Route
+            path={`/${username}`}
+            element={user ? <Profile /> : <LoginPage />}
+          />
         </Routes>
       </BrowserRouter>
     </userContext.Provider>

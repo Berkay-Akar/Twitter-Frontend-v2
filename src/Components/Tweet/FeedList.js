@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FeedItem from "./FeedItem";
 
-function FeedList({ tweets, likePost, deletePost }) {
+function FeedList({ posts, setPosts }) {
   return (
-    <div>
-      {tweets.map((tweet) => (
+    <>
+      {posts?.map((tweet) => (
         <FeedItem
           key={tweet.post_id}
           tweet={tweet}
-          likePost={likePost}
-          deletePost={deletePost}
+          posts={posts}
+          setPosts={setPosts}
         />
       ))}
-    </div>
+    </>
   );
 }
 

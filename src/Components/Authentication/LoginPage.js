@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useState, useContext } from "react";
 import axios from "axios";
 import { userContext } from "../../App";
-import { Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const { user } = useContext(userContext);

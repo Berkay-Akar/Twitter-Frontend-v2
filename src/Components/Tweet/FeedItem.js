@@ -2,9 +2,54 @@ import React, { useContext } from "react";
 import { BiLike } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
 import { userContext } from "../../App";
+import { likePost, deletePost } from "../../functions";
 
-function FeedItem({ tweet, likePost, deletePost, comments }) {
+function FeedItem({ tweet, posts, setPosts }) {
   const { user } = useContext(userContext);
+
+  const handleLike = async (e) => {
+    e.preventDefault();
+    (async () => {
+      try {
+        const likeTweet = await likePost(tweet.post_id);
+        const postId = likeTweet.post_id;
+        // const updatedPosts = posts.map((post) => {
+        //   if (post.post_id === postId) {
+        //     post = likeTweet;
+        //   }
+        //   return post;
+        // });
+        setPosts((prev) => {
+          return prev.map((post) => {
+            if (post.post_id === postId) {
+              post.like_count = likeTweet.like_count;
+            }
+            return post;
+          });
+        });
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    })();
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    (async () => {
+      try {
+        // Your async code here
+        const deletedTweet = await deletePost(tweet.post_id);
+        const postId = deletedTweet.post_id;
+        const updatedPosts = posts.filter((post) => {
+          return post.post_id !== postId;
+        });
+        console.log("UPDATED POSTS:", updatedPosts);
+        setPosts(updatedPosts);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    })();
+  };
 
   return (
     <a href={`/tweet/${tweet.username}/${tweet.post_id}`} rel="noreferrer">
@@ -17,10 +62,10 @@ function FeedItem({ tweet, likePost, deletePost, comments }) {
           />
           <div className="flex  items-center ml-8">
             <span className="font-bold text-md text-black-black">
-              {user ? user.full_name : "Unknown User"}
+              {tweet.full_name}
             </span>
             <span className="text-sm text-gray-dark">
-              @{user ? user.username : "unknown"}
+              @{tweet.username ? tweet.username : "unknown"}
             </span>
           </div>
         </div>
@@ -28,20 +73,17 @@ function FeedItem({ tweet, likePost, deletePost, comments }) {
           <p className="text-md text-black-black break-all">
             {tweet.post_text}
           </p>
-          <div className="flex flex-col cursor-pointer">
-            <BsTrash3 onClick={() => deletePost(tweet.post_id)} />
-            <BiLike
-              className="w-6 h-6 text-primary-base mb-0 mr-0 hover: cursor-pointer"
-              onClick={() => likePost(tweet.post_id)}
-            />
-            <span className="text-sm text-gray-dark">{tweet.like_count}</span>
-          </div>
         </div>
-        {/* {comments.length > 0 ? (
-          <CommentList comments={comments} posts={tweet} />
-        ) : null}
-        <Comment />
-        <CommentList /> */}
+        <div className="flex flex-row cursor-pointer items-center">
+          <BiLike
+            className="w-6 h-6 text-primary-base hover: cursor-pointer  ml-12"
+            onClick={handleLike}
+          />
+          <span className="text-sm text-gray-dark">{tweet.like_count}</span>
+          {user.id === tweet.post_user ? (
+            <BsTrash3 onClick={handleDelete} className="ml-8" />
+          ) : null}
+        </div>
       </article>
     </a>
   );

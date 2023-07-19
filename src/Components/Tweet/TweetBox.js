@@ -1,8 +1,25 @@
 import React, { useContext, useState } from "react";
 import { AiOutlinePicture } from "react-icons/ai";
+import { likePost, deletePost, sendTweet } from "../../functions";
+import { userContext } from "../../App";
 
-function TweetBox({ sendTweet }) {
+function TweetBox({ posts, setPosts }) {
   const [tweet, setTweet] = useState("");
+  const { user } = useContext(userContext);
+
+  const handleSendTweet = async (e) => {
+    e.preventDefault();
+    (async () => {
+      try {
+        // Your async code here
+        const sentTweet = await sendTweet(tweet, user);
+        setPosts([sentTweet, ...posts]);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    })();
+    setTweet("");
+  };
 
   return (
     <div className="flex-1 flex flex-col mt-2 px-2">
@@ -20,10 +37,7 @@ function TweetBox({ sendTweet }) {
         </div>
         <button
           className="bg-primary-base text-white rounded-full px-4 py-2  font-medium"
-          onClick={() => {
-            sendTweet(tweet);
-            setTweet("");
-          }}
+          onClick={handleSendTweet}
         >
           Tweet
         </button>

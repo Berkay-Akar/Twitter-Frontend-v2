@@ -4,94 +4,76 @@ import axios from "axios";
 import Sidebar from "../SideBar/Sidebar";
 import Layout from "../Layout/Layout";
 function TweetDetail({ tweets }) {
-  const [tweetDetail, setTweetDetail] = useState(null);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const { tweetId } = useParams();
+  const [post, setPost] = useState({});
+  const [user, setUser] = useState({});
+  console.log("TWEET ID:", tweetId);
 
   useEffect(() => {
     getTweetWithComments(tweetId);
   }, [tweetId]);
 
-  useEffect(() => {
-    // Fetch comments for the selected tweet
-    if (tweetDetail) {
-      fetchComments(tweetDetail.post_id);
-    }
-  }, [tweetDetail]);
-
-  const fetchComments = async (postId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3001/comments/${postId}`
-      );
-      setComments(response.data.comments);
-    } catch (error) {
-      console.log("Error fetching comments:", error);
-    }
-  };
-
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    if (commentText.trim() === "") {
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        "http://localhost:3001/comments",
-        {
-          comment_text: commentText,
-          user_id: tweetDetail.post_user,
-          post_id: tweetDetail.post_id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      // Clear the comment input and update comments
-      setCommentText("");
-      fetchComments(tweetDetail.post_id); // Fetch comments after submitting a new comment
-    } catch (error) {
-      console.log("Error posting comment:", error);
-    }
-  };
-
   const getTweetWithComments = async (tweetId) => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/posts/tweets/${tweetId}`,
+        `http://localhost:3001/tweets/${tweetId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
-      setTweetDetail(response.data.post);
+      const post = response.data.post;
+      const user = response.data.post.user;
+      setComments(response.data.post.comments);
+      setPost(post);
+      setUser(user);
     } catch (error) {
       console.log(error.response?.data?.error);
     }
   };
 
-  if (!tweetDetail) {
-    return null; // Return null if there's no tweet detail
-  }
-  console.log("TWEET DETAIL: ", tweetDetail);
+  const postComment = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `http://localhost:3001/comments/${tweetId}`,
+        {
+          comment_text: commentText,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          params: {
+            post_id: tweetId,
+          },
+        }
+      );
+      const updatedComments = [response.data.comment, ...comments];
+      setComments(updatedComments);
+      setCommentText("");
+    } catch (error) {
+      console.log(error.response?.data?.error);
+    }
+  };
+
   return (
     <div className="flex min-h-screen max-w-7xl mx-auto border">
       <Sidebar />
       <div className="mt-4">
-        <h3 className="text-xl font-semibold">{tweetDetail.username}</h3>
+        <h3 className="text-xl font-semibold">{user.username}</h3>
         <div className="p-4 bg-white rounded-lg shadow">
-          <p className="text-gray-600">{tweetDetail.post_text}</p>
+          <p className="text-gray-600">{post.text}</p>
         </div>
         <div className="mt-4">
           <h3 className="text-xl font-semibold">Comments</h3>
           <div className="p-4 bg-white rounded-lg shadow">
-            <form onSubmit={handleCommentSubmit}>
+            <form>
               <input
+                //onSubmit={postComment}
                 type="text"
                 placeholder="Write a comment..."
                 value={commentText}
@@ -101,6 +83,7 @@ function TweetDetail({ tweets }) {
               <button
                 type="submit"
                 className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+                onClick={postComment}
               >
                 Post Comment
               </button>
