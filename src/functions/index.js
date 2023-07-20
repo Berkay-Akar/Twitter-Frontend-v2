@@ -44,9 +44,10 @@ export const deletePost = async (postId) => {
 
 export const likePost = async (postId) => {
   try {
+    console.log(localStorage.getItem("token"));
     const response = await axios.post(
       `http://localhost:3001/likes/${postId}`,
-
+      undefined,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -62,8 +63,10 @@ export const likePost = async (postId) => {
 
 export const unlikePost = async (postId) => {
   try {
+    console.log(localStorage.getItem("token"));
     const response = await axios.delete(
       `http://localhost:3001/likes/${postId}`,
+
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -72,10 +75,9 @@ export const unlikePost = async (postId) => {
     );
     console.log("RESPONSE:", response.data);
     if (!response.data) return;
+
     return response.data.post;
-  } catch (error) {
-    console.log("Error unliking post:", error);
-  }
+  } catch (error) {}
 };
 
 export const getTweetWithLikes = async (postId) => {

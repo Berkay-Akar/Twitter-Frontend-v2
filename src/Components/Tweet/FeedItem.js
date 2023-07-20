@@ -1,43 +1,75 @@
-import React, { useContext } from "react";
-import { BiLike } from "react-icons/bi";
+import React, { useContext, useEffect, useState } from "react";
+import { BsFillHeartFill } from "react-icons/bs";
+import { AiOutlineHeart } from "react-icons/ai";
 import { BsTrash3 } from "react-icons/bs";
 import { userContext } from "../../App";
-import { likePost, deletePost } from "../../functions";
+import axios from "axios";
+import { likePost, unlikePost, deletePost } from "../../functions";
 
 function FeedItem({ tweet, posts, setPosts }) {
   const { user } = useContext(userContext);
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    getLikedUserByPost();
+  }, [tweet]);
+
+  const getLikedUserByPost = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/tweets/liked/user/${tweet.post_id}`,
+        [tweet.post_id]
+      );
+      const likedUsers = response.data.users;
+      const currentUserID = user.id;
+
+      const currentUserLiked = likedUsers.some((likedUser) => {
+        return likedUser.user_id === currentUserID;
+      });
+
+      setIsLiked(currentUserLiked);
+      console.log(isLiked);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const handleLike = async (e) => {
     e.preventDefault();
-    (async () => {
-      try {
-        const likeTweet = await likePost(tweet.post_id);
-        const postId = likeTweet.post_id;
-        // const updatedPosts = posts.map((post) => {
-        //   if (post.post_id === postId) {
-        //     post = likeTweet;
-        //   }
-        //   return post;
-        // });
-        setPosts((prev) => {
-          return prev.map((post) => {
-            if (post.post_id === postId) {
-              post.like_count = likeTweet.like_count;
-            }
-            return post;
-          });
-        });
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    })();
+    try {
+      console.log("COUNT:", tweet.like_count);
+      const likedTweet = await likePost(tweet.post_id);
+      console.log("Like tweet", likedTweet);
+      const updatedPosts = posts.map((post) =>
+        post.post_id === likedTweet.post_id ? likedTweet : post
+      );
+
+      setPosts(updatedPosts);
+      setIsLiked(true);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleUnLike = async (e) => {
+    e.preventDefault();
+    try {
+      console.log(tweet);
+      const unlikedTweet = await unlikePost(tweet.post_id);
+      const updatedPosts = posts.map((post) =>
+        post.post_id === unlikedTweet.post_id ? unlikedTweet : post
+      );
+      setPosts(updatedPosts);
+      setIsLiked(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const handleDelete = async (e) => {
     e.preventDefault();
     (async () => {
       try {
-        // Your async code here
         const deletedTweet = await deletePost(tweet.post_id);
         const postId = deletedTweet.post_id;
         const updatedPosts = posts.filter((post) => {
@@ -45,6 +77,7 @@ function FeedItem({ tweet, posts, setPosts }) {
         });
         console.log("UPDATED POSTS:", updatedPosts);
         setPosts(updatedPosts);
+        setIsLiked(false);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -62,10 +95,10 @@ function FeedItem({ tweet, posts, setPosts }) {
           />
           <div className="flex  items-center ml-8">
             <span className="font-bold text-md text-black-black">
-              {tweet.full_name}
+              {tweet.user.full_name ? tweet.user.full_name : "unknown"}
             </span>
             <span className="text-sm text-gray-dark">
-              @{tweet.username ? tweet.username : "unknown"}
+              @{tweet.user.username ? tweet.user.username : "unknown"}
             </span>
           </div>
         </div>
@@ -75,10 +108,19 @@ function FeedItem({ tweet, posts, setPosts }) {
           </p>
         </div>
         <div className="flex flex-row cursor-pointer items-center">
-          <BiLike
-            className="w-6 h-6 text-primary-base hover: cursor-pointer  ml-12"
-            onClick={handleLike}
-          />
+          <>
+            {!isLiked ? (
+              <AiOutlineHeart
+                className="w-6 h-6  hover: cursor-pointer  ml-12 rounded-full hover:w-8 hover:h-8 hover:text-primary-base hover:bg-gray-lightest transform transition-colors duratios-200"
+                onClick={handleLike}
+              />
+            ) : (
+              <BsFillHeartFill
+                className="w-6 h-6 text-primary-base hover: cursor-pointer  ml-12"
+                onClick={handleUnLike}
+              />
+            )}
+          </>
           <span className="text-sm text-gray-dark">{tweet.like_count}</span>
           {user.id === tweet.post_user ? (
             <BsTrash3 onClick={handleDelete} className="ml-8" />

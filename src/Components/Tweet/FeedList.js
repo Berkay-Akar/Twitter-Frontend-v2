@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import FeedItem from "./FeedItem";
 
 function FeedList({ posts, setPosts }) {
@@ -6,8 +6,8 @@ function FeedList({ posts, setPosts }) {
     <>
       {posts?.map((tweet) => (
         <FeedItem
-          key={tweet.post_id}
-          tweet={tweet}
+          key={tweet.post.post_id}
+          tweet={tweet.post}
           posts={posts}
           setPosts={setPosts}
         />

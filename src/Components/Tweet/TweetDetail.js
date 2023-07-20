@@ -9,7 +9,7 @@ function TweetDetail({ tweets }) {
   const { tweetId } = useParams();
   const [post, setPost] = useState({});
   const [user, setUser] = useState({});
-  console.log("TWEET ID:", tweetId);
+  console.log("POST:", post);
 
   useEffect(() => {
     getTweetWithComments(tweetId);

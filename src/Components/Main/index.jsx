@@ -12,7 +12,6 @@ function Main() {
 
   useEffect(() => {
     fetchData();
-    console.log("POSTS", posts);
   }, [user]);
 
   const fetchData = async () => {

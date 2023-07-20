@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
-  Tabs,
-  TabsHeader,
-  TabsBody,
   Tab,
   TabPanel,
+  Tabs,
+  TabsBody,
+  TabsHeader,
 } from "@material-tailwind/react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 export default function ProfileTab() {
   const [activeTab, setActiveTab] = React.useState("html");
@@ -15,7 +15,6 @@ export default function ProfileTab() {
   const [likes, setLikes] = useState([]);
   useEffect(() => {
     fetchTweets();
-    console.log("TWEETS: ", tweets);
   }, []);
 
   const fetchTweets = async () => {
