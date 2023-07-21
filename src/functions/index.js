@@ -37,6 +37,7 @@ export const deletePost = async (postId) => {
     console.log("RESPONSE:", response.data);
     if (!response.data) return;
     return response.data.post;
+    console.log("RESPONSE DATA POST:", response.data.post);
   } catch (error) {
     console.log("Error deleting post:", error);
   }
@@ -44,7 +45,6 @@ export const deletePost = async (postId) => {
 
 export const likePost = async (postId) => {
   try {
-    console.log(localStorage.getItem("token"));
     const response = await axios.post(
       `http://localhost:3001/likes/${postId}`,
       undefined,
@@ -56,7 +56,7 @@ export const likePost = async (postId) => {
     );
     console.log("RESPONSE:", response.data);
     if (!response.data) return;
-
+    console.log("RESPONSE DATA POST:", response.data.post);
     return response.data.post;
   } catch (error) {}
 };

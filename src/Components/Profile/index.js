@@ -12,6 +12,7 @@ function Profile() {
   const { user } = useContext(userContext);
   const [posts, setPosts] = useState([]);
   const [posts_user, setPosts_user] = useState(null);
+  console.log("USER:", user);
   const date = new Date().toLocaleDateString("tr-TR", {
     year: "numeric",
     month: "long",
@@ -68,10 +69,10 @@ function Profile() {
             </div>
             <div className="flex flex-col gap-2">
               <h5 className="font-bold text-xl tracking-wider  pt-8 ">
-                {user.full_name}
+                {user?.full_name}
               </h5>
               <span className="font-semibold text-sm text-gray-dark">
-                @{user.username}
+                @{user?.username}
               </span>
 
               <span>#aideveloper</span>

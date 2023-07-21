@@ -5,7 +5,7 @@ import { SiPostman } from "react-icons/si";
 import { GrUserManager } from "react-icons/gr";
 import UserBox from "./UserBox";
 import { userContext } from "../../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { GiJumpingDog } from "react-icons/gi";
 
 initTE({ Sidenav });
@@ -31,7 +31,7 @@ function Sidebar({ handleLogout }) {
         </div>
         <nav className="flex-col mb-4 cursor-pointer">
           <ul className="text-xl  block">
-            <a href="/">
+            <Link to="/">
               <li
                 className={`mb-4 flex items-center hover:bg-primary-light group-hover:text-primary-base rounded-full pl-3 pr-8 py-3 ${
                   active === "home" ? "bg-primary-light text-primary-base" : ""
@@ -42,9 +42,9 @@ function Sidebar({ handleLogout }) {
 
                 <span className="ml-4 font-bold">Home</span>
               </li>
-            </a>
+            </Link>
             {user ? (
-              <a href={`/${user?.username}`}>
+              <Link to={`/${user?.username}`}>
                 <li
                   className={`mb-4 flex items-center hover:bg-primary-light group-hover:text-primary-base rounded-full pl-3 pr-8 py-3 ${
                     active === "profile"
@@ -57,14 +57,14 @@ function Sidebar({ handleLogout }) {
 
                   <span className="ml-4 font-bold">Profile</span>
                 </li>
-              </a>
+              </Link>
             ) : (
-              <a href="/auth/login">
+              <Link to="/auth/login">
                 <li className=" flex bg-primary-base text-white rounded-full py-3 px-8 w-11/12 shadow-lg hover:bg-primary-dark transform transition-colors duration-200">
                   <GiJumpingDog className="w-8 h-8 " />
                   <span>Login</span>
                 </li>
-              </a>
+              </Link>
             )}
           </ul>
         </nav>

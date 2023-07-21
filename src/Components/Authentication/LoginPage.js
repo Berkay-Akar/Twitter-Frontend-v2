@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useState, useContext } from "react";
 import axios from "axios";
 import { userContext } from "../../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function LoginPage() {
   const { user } = useContext(userContext);
@@ -82,12 +82,12 @@ function LoginPage() {
             <input className="mr-1" type="checkbox" />
             <span>Remember Me</span>
           </label>
-          <a
+          <Link
             className="text-blue-600 hover:text-blue-700 hover:underline hover:underline-offset-4"
-            href="#"
+            to="#"
           >
             Forgot Password?
-          </a>
+          </Link>
         </div>
         <div className="text-center md:text-left">
           <button
@@ -100,13 +100,13 @@ function LoginPage() {
         </div>
         <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
           Don't have an account?{" "}
-          <a
+          <Link
             className="text-red-600 hover:underline hover:underline-offset-4 cursor-pointer"
             type="submit"
-            href="/register"
+            to="/auth/register"
           >
             Register
-          </a>
+          </Link>
         </div>
       </div>
     </section>

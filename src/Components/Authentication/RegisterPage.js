@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { userContext } from "../../App";
 
 export default function RegisterPage(props) {
@@ -38,7 +38,7 @@ export default function RegisterPage(props) {
         const token = res.data.token;
         localStorage.setItem("token", token);
         alert("Registration Successful");
-        navigate("/login");
+        navigate("/auth/login");
       } else {
         throw new Error(res.data.error || "Registration failed");
       }
@@ -51,9 +51,9 @@ export default function RegisterPage(props) {
     <div>
       <div className="flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 bg-gray-50">
         <div>
-          <a href="/">
+          <Link to="/">
             <h3 className="text-4xl font-bold text-purple-600">Logo</h3>
-          </a>
+          </Link>
         </div>
         <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md sm:rounded-lg">
           <form>
@@ -148,12 +148,12 @@ export default function RegisterPage(props) {
               </div>
             </div>
             <div className="flex items-center justify-end mt-4">
-              <a
+              <Link
                 className="text-sm text-gray-600 underline hover:text-gray-900"
-                href="/login"
+                to="/login"
               >
                 Already registered?
-              </a>
+              </Link>
               <button
                 type="submit"
                 onClick={handleRegister}

@@ -24,7 +24,8 @@ function Main() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log("RESPONSE: ", response.data);
+
+      console.log("RESPONSE MAIN: ", response.data);
       if (!response.data.posts.length) return;
       setPosts(response.data.posts);
     } catch (error) {
