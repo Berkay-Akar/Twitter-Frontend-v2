@@ -50,45 +50,6 @@ function FeedItem({ tweet, posts, setPosts }) {
     }
   };
 
-  // const handleLike = async (e) => {
-  //   e.preventDefault();
-
-  //   if (tweet.is_liked === true) {
-  //     console.log("DELETE::::::::::::::::::::::::::::", tweet.is_liked);
-  //     return handleDelete(tweet.post_id);
-  //   }
-
-  //   try {
-  //     console.log("COUNT:", tweet.like_count);
-  //     const likedTweet = await likePost(tweet.post_id);
-  //     console.log("post_id", tweet.post_id);
-  //     console.log("Like tweet", likedTweet);
-  //     const updatedPosts = posts.map((post) =>
-  //       post.post_id === likedTweet.post_id ? likedTweet : post
-  //     );
-
-  //     setPosts(updatedPosts);
-  //     setIsLiked(true);
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
-
-  // const handleUnLike = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     console.log(tweet);
-  //     const unlikedTweet = await unlikePost(tweet.post_id);
-  //     const updatedPosts = posts.map((post) =>
-  //       post.post_id === unlikedTweet.post_id ? unlikedTweet : post
-  //     );
-  //     setPosts(updatedPosts);
-  //     setIsLiked(false);
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
-
   const handleLike = async (e) => {
     e.preventDefault();
 
@@ -143,8 +104,9 @@ function FeedItem({ tweet, posts, setPosts }) {
 
   return (
     <Link
-      to={`/tweet/${tweet?.user?.username}/${tweet?.post_id}`}
+      to={`/tweet/${tweet?.username}/${tweet?.post_id}`}
       rel="noreferrer"
+      className="cursor-pointer"
     >
       <article className="flex flex-col shadow my-4">
         <div className="flex items-center ">
@@ -155,10 +117,10 @@ function FeedItem({ tweet, posts, setPosts }) {
           />
           <div className="flex  items-center ml-8">
             <span className="font-bold text-md text-black-black">
-              {tweet?.user?.full_name ? tweet?.user?.full_name : "unknown"}
+              {tweet?.full_name ? tweet?.full_name : "unknown"}
             </span>
             <span className="text-sm text-gray-dark">
-              @{tweet?.user?.username ? tweet?.user?.username : "unknown"}
+              @{tweet?.username ? tweet?.username : "unknown"}
             </span>
           </div>
         </div>

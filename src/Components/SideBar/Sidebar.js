@@ -13,6 +13,9 @@ initTE({ Sidenav });
 function Sidebar({ handleLogout }) {
   const { user } = useContext(userContext);
   const [active, setActive] = useState("home");
+
+  console.log(active);
+
   const navigate = useNavigate();
   const handleItemClick = (page) => {
     setActive(page);

@@ -10,6 +10,7 @@ import FeedItem from "../Tweet/FeedItem";
 
 function Profile() {
   const { user } = useContext(userContext);
+  console.log("USER:", user);
   const [posts, setPosts] = useState([]);
   const [posts_user, setPosts_user] = useState(null);
   console.log("USER:", user);
@@ -45,6 +46,7 @@ function Profile() {
       console.log("Error fetching posts:", error);
     }
   };
+  console.log("POSTS:", posts);
 
   return (
     <div className="">

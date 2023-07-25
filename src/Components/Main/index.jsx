@@ -32,6 +32,7 @@ function Main() {
       console.log("Error fetching posts:", error);
     }
   };
+  console.log("POSTS: ", posts);
 
   return (
     <main className="z-10 flex-1 flex flex-col border-r border-l border-gray-extraLight">
