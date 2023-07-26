@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../SideBar/Sidebar";
 import Layout from "../Layout/Layout";
-function TweetDetail({ tweets }) {
+function TweetDetail() {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const { tweetId } = useParams();
@@ -18,16 +18,17 @@ function TweetDetail({ tweets }) {
   const getTweetWithComments = async (tweetId) => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/tweets/${tweetId}`,
+        `http://localhost:4000/tweets/${tweetId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
-      const post = response.data.post;
-      const user = response.data.post.user;
-      setComments(response.data.post.comments);
+      console.log("RESPONSE:", response.data);
+      const post = response.data.tweet;
+      const user = response.data.tweet.user;
+      setComments(response.data.tweet.replies);
       setPost(post);
       setUser(user);
     } catch (error) {
@@ -61,12 +62,12 @@ function TweetDetail({ tweets }) {
   };
 
   return (
-    <div className="flex min-h-screen max-w-7xl mx-auto border">
+    <div className="flex min-h-screen max-w-7xl mx-auto border w-max">
       <Sidebar />
-      <div className="mt-4">
+      <div className="flex flex-col mt-4 w-[480px]">
         <h3 className="text-xl font-semibold">{user.username}</h3>
         <div className="p-4 bg-white rounded-lg shadow">
-          <p className="text-gray-600">{post.text}</p>
+          <p className="text-gray-600">{post.content}</p>
         </div>
         <div className="mt-4">
           <h3 className="text-xl font-semibold">Comments</h3>
@@ -91,10 +92,10 @@ function TweetDetail({ tweets }) {
           </div>
           {comments.map((comment) => (
             <div
-              key={comment.comment_id}
+              key={comment.id}
               className="mt-4 p-4 bg-white rounded-lg shadow"
             >
-              <p className="text-gray-600">{comment.comment_text}</p>
+              <p className="text-gray-600">{comment.content}</p>
             </div>
           ))}
         </div>

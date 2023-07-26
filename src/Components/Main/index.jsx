@@ -19,20 +19,26 @@ function Main() {
       if (!user) {
         return;
       }
-      const response = await axios.get("http://localhost:3001/tweets", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const response = await axios.get(
+        "http://localhost:4000/tweets/following",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (!response.data.result) return;
+      const posts = response.data.result.map((post) => {
+        return {
+          ...post,
+        };
       });
 
-      console.log("RESPONSE MAIN: ", response.data);
-      if (!response.data.posts.length) return;
-      setPosts(response.data.posts);
+      setPosts(response.data.result);
     } catch (error) {
       console.log("Error fetching posts:", error);
     }
   };
-  console.log("POSTS: ", posts);
 
   return (
     <main className="z-10 flex-1 flex flex-col border-r border-l border-gray-extraLight">

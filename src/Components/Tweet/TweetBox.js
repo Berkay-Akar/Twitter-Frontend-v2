@@ -12,7 +12,8 @@ function TweetBox({ posts, setPosts }) {
     (async () => {
       try {
         // Your async code here
-        const sentTweet = await sendTweet(tweet, user);
+        const sentTweet = await sendTweet(tweet);
+        console.log("SENT TWEET:", sentTweet);
         setPosts([sentTweet, ...posts]);
       } catch (error) {
         console.error("Error:", error);

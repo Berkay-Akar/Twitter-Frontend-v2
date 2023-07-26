@@ -1,15 +1,14 @@
 import axios from "axios";
 
-export const sendTweet = async (tweet, user) => {
+export const sendTweet = async (tweet) => {
   if (tweet.length === 0) {
     return;
   }
   try {
     const response = await axios.post(
-      "http://localhost:3001/tweets",
+      "http://localhost:4000/tweets",
       {
-        post_user: user.id,
-        post_text: tweet,
+        content: tweet,
       },
       {
         headers: {
@@ -17,7 +16,7 @@ export const sendTweet = async (tweet, user) => {
         },
       }
     );
-    return response.data.post;
+    return response.data.tweet;
   } catch (error) {
     console.log(error.response.data.error);
   }
@@ -26,7 +25,7 @@ export const sendTweet = async (tweet, user) => {
 export const deletePost = async (postId) => {
   try {
     const response = await axios.delete(
-      `http://localhost:3001/tweets/${postId}`,
+      `http://localhost:4000/tweets/${postId}`,
 
       {
         headers: {
@@ -34,10 +33,8 @@ export const deletePost = async (postId) => {
         },
       }
     );
-    console.log("RESPONSE:", response.data);
     if (!response.data) return;
-    return response.data.post;
-    console.log("RESPONSE DATA POST:", response.data.post);
+    return response.data.deletedTweet;
   } catch (error) {
     console.log("Error deleting post:", error);
   }
@@ -46,7 +43,7 @@ export const deletePost = async (postId) => {
 export const likePost = async (postId) => {
   try {
     const response = await axios.post(
-      `http://localhost:3001/likes/${postId}`,
+      `http://localhost:4000/tweets/like/${postId}`,
       undefined,
       {
         headers: {
@@ -54,18 +51,18 @@ export const likePost = async (postId) => {
         },
       }
     );
-    console.log("RESPONSE:", response.data);
-    if (!response.data) return;
-    console.log("RESPONSE DATA POST:", response.data.post);
-    return response.data.post;
-  } catch (error) {}
+    if (!response.data.likedTweet) return null; // Handle case when response data is empty
+    return response.data.likedTweet;
+  } catch (error) {
+    console.error("Error liking post:", error);
+    return null;
+  }
 };
 
 export const unlikePost = async (postId) => {
   try {
-    console.log(localStorage.getItem("token"));
     const response = await axios.delete(
-      `http://localhost:3001/likes/${postId}`,
+      `http://localhost:4000/tweets/like/${postId}`,
 
       {
         headers: {
@@ -73,42 +70,29 @@ export const unlikePost = async (postId) => {
         },
       }
     );
-    console.log("RESPONSE:", response.data);
-    if (!response.data) return;
+    if (!response.data.unlikedTweet) return;
 
-    return response.data.post;
+    return response.data.unlikedTweet;
   } catch (error) {}
 };
 
-export const getTweetWithLikes = async (postId) => {
+// retweet a tweet
+export const retweetPost = async (postId) => {
   try {
-    const response = await axios.get(`http://localhost:3001/likes/${postId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    console.log("RESPONSE:", response.data);
-    if (!response.data) return;
-    return response.data.post;
-  } catch (error) {
-    console.log("Error unliking post:", error);
-  }
-};
-
-export const getTweetForUser = async (userId) => {
-  try {
-    const response = await axios.get(
-      `http://localhost:3001/likes/user/${userId}`,
+    const response = await axios.post(
+      `http://localhost:4000/tweets/retweet/${postId}`,
+      undefined,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
-    console.log("RESPONSE:", response.data);
-    if (!response.data) return;
-    return response.data.post;
+    console.log("RESPONSE:", response);
+    if (!response.data) return null;
+    return response.data;
   } catch (error) {
-    console.log("Error unliking post:", error);
+    console.error("Error retweeting post:", error);
+    return null;
   }
 };

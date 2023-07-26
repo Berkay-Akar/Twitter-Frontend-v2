@@ -9,28 +9,27 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 export default function ProfileTab() {
-  const [activeTab, setActiveTab] = React.useState("html");
-  const { value, setValue } = useState(0);
+  const [activeTab, setActiveTab] = React.useState("tweets");
   const [tweets, setTweets] = useState([]);
-  const [likes, setLikes] = useState([]);
+
   useEffect(() => {
     fetchTweets();
   }, []);
 
   const fetchTweets = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.get("http://localhost:4000/profile/user", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      if (!response.data.posts.length) return;
-      setTweets(response.data.posts);
+      setTweets(response.data.result);
     } catch (error) {
       console.log("Error fetching posts:", error);
     }
   };
 
+  console.log(tweets);
   return (
     <Tabs value={activeTab}>
       <TabsHeader
@@ -53,8 +52,8 @@ export default function ProfileTab() {
       <TabsBody>
         <TabPanel value={activeTab} index="tweets">
           {tweets.map((tweet) => (
-            <div key={tweet.post_id}>
-              <p>{tweet.post_text}</p>
+            <div key={tweet.id}>
+              <p>{tweet.content}</p>
             </div>
           ))}
         </TabPanel>

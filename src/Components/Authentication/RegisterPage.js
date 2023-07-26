@@ -9,6 +9,7 @@ export default function RegisterPage(props) {
   const [formData, setFormData] = useState({
     name: "",
     username: "",
+    email: "",
     password: "",
     password_confirmation: "",
   });
@@ -33,7 +34,10 @@ export default function RegisterPage(props) {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:3001/register", formData);
+      const res = await axios.post(
+        "http://localhost:4000/auth/register",
+        formData
+      );
       if (res.data.token) {
         const token = res.data.token;
         localStorage.setItem("token", token);

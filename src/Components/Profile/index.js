@@ -3,12 +3,27 @@ import { userContext } from "../../App";
 import axios from "axios";
 import Sidebar from "../SideBar/Sidebar";
 import Layout from "../Layout/Layout";
-import FeedList from "../Tweet/FeedList";
 import Divider from "../Main/Divider";
 import ProfileTab from "./ProfileTab";
 import FeedItem from "../Tweet/FeedItem";
+import { useParams } from "react-router-dom";
+
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+  Textarea,
+} from "@material-tailwind/react";
 
 function Profile() {
+  const [open, setOpen] = React.useState(false);
+  const { username } = useParams();
+  console.log("USERNAME:", username);
+
+  const handleOpen = () => setOpen(!open);
   const { user } = useContext(userContext);
   console.log("USER:", user);
   const [posts, setPosts] = useState([]);
@@ -19,34 +34,35 @@ function Profile() {
     month: "long",
     day: "numeric",
   });
+  const [currentUser, setUser] = useState(null);
 
   useEffect(() => {
-    fetchData();
-  }, [user]);
+    fetchUserProfile(username);
+  }, [username]);
 
-  const fetchData = async () => {
+  const fetchUserProfile = async (username) => {
     try {
-      if (!user) {
-        return;
-      }
-      const response = await axios.get("http://localhost:3001/profile", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (!response.data.posts.length) return;
-      const loggedInUser = response.data.posts.find(
-        (post) => post.user.id === user.id
+      const response = await axios.get(
+        `http://localhost:4000/profile/user/${username}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
-      if (!loggedInUser) return;
-      const posts = loggedInUser.user.posts;
+      console.log("USERNAME:", username);
+      console.log("RESPONSE:", response);
+      const posts = response.data.tweets;
       setPosts(posts);
-      setPosts_user(loggedInUser.user.id);
+      setPosts_user(response.data.tweets.user_id);
+      setUser(response.data.tweets[0].user);
+      console.log("posts_user:", posts_user);
     } catch (error) {
-      console.log("Error fetching posts:", error);
+      console.log(error.response?.data?.error);
     }
   };
-  console.log("POSTS:", posts);
+
+  console.log("PROFILE POSTS:", posts);
 
   return (
     <div className="">
@@ -69,37 +85,95 @@ function Profile() {
                 alt=""
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <h5 className="font-bold text-xl tracking-wider  pt-8 ">
-                {user?.full_name}
-              </h5>
+            <div className="flex flex-col gap-2 ">
+              <div className="flex justify-between w-full">
+                <h5 className="font-bold text-xl tracking-wider  pt-8 ">
+                  {user?.name}
+                </h5>
+
+                <>
+                  <Button onClick={handleOpen} className="mr-11 h-10">
+                    Edit Profile
+                  </Button>
+                  <Dialog open={open} handler={handleOpen}>
+                    <div className="flex items-center justify-between">
+                      <DialogHeader>New message to @</DialogHeader>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="mr-3 h-5 w-5"
+                        onClick={handleOpen}
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L10.94 12l-5.47 5.47a.75.75 0 01-1.06-1.06L5.47 5.47a.75.75 0 010-1.06z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <DialogBody divider>
+                      <div className="grid gap-6">
+                        <Input label="Username" />
+                        <Textarea label="Message" />
+                      </div>
+                    </DialogBody>
+                    <DialogFooter className="space-x-2">
+                      <Button
+                        variant="outlined"
+                        color="red"
+                        onClick={handleOpen}
+                      >
+                        close
+                      </Button>
+                      <Button
+                        variant="gradient"
+                        color="green"
+                        onClick={handleOpen}
+                      >
+                        send message
+                      </Button>
+                    </DialogFooter>
+                  </Dialog>
+                </>
+              </div>
               <span className="font-semibold text-sm text-gray-dark">
                 @{user?.username}
               </span>
 
-              <span>#aideveloper</span>
+              <span>
+                {user?.description ? user.description : "description"}
+              </span>
               <span>{date}</span>
-              <div>
-                <span>785 Takip edilen </span>
-                <span>1502 Takipçi</span>
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1 items-center">
+                  <span>{user?.followers_count} </span>
+                  <span className="font-semibold text-sm text-gray-dark">
+                    Followers
+                  </span>
+                </div>
+                <div className="flex gap-1 items-center">
+                  <span>{user?.following_count} </span>
+                  <span className="font-semibold text-sm text-gray-dark">
+                    Following
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div>
-              <ProfileTab />
-            </div>
+            <div>{/* <ProfileTab /> */}</div>
           </div>
           <Divider />
-          {posts_user === user.id &&
-            posts.map((post) => (
-              <FeedItem
-                key={post.id}
-                tweet={post}
-                posts={posts}
-                user={post.user}
-                setPosts={setPosts}
-              />
-            ))}
+          {posts.map((post) => (
+            <FeedItem
+              key={post.id}
+              tweet={post}
+              posts={posts}
+              user={user}
+              setPosts={setPosts}
+              fetchUserProfile={fetchUserProfile}
+            />
+          ))}
         </div>
         <div className="flex-auto">
           <Layout />

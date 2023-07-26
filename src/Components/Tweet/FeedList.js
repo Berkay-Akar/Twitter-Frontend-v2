@@ -4,14 +4,16 @@ import FeedItem from "./FeedItem";
 function FeedList({ posts, setPosts }) {
   return (
     <>
-      {posts?.map((tweet) => (
-        <FeedItem
-          key={tweet.post.post_id}
-          tweet={tweet.post}
-          posts={posts}
-          setPosts={setPosts}
-        />
-      ))}
+      {posts?.map((tweet) =>
+        tweet.originalTweetId ? null : (
+          <FeedItem
+            key={tweet.id}
+            tweet={tweet}
+            posts={posts}
+            setPosts={setPosts}
+          />
+        )
+      )}
     </>
   );
 }

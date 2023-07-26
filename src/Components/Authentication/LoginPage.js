@@ -12,7 +12,7 @@ function LoginPage() {
   const { setUser } = useContext(userContext);
 
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
   useEffect(() => {
@@ -31,13 +31,14 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     const data = {
-      username: formData.username,
+      email: formData.email,
       password: formData.password,
     };
 
     try {
-      const res = await axios.post("http://localhost:3001/login", data);
+      const res = await axios.post("http://localhost:4000/auth/login", data);
       if (res.data.token) {
+        console.log("RES DATA:", res.data);
         const token = res.data.token;
         const user = res.data.user;
         localStorage.setItem("token", token);
@@ -63,10 +64,10 @@ function LoginPage() {
       <div className="md:w-1/3 max-w-sm">
         <input
           className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
-          id="username"
+          id="email"
           type="text"
-          placeholder="Username"
-          name="username"
+          placeholder="E-mail"
+          name="email"
           onChange={handleChange}
         />
         <input

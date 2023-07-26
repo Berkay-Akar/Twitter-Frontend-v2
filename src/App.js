@@ -5,13 +5,14 @@ import RegisterPage from "./Components/Authentication/RegisterPage";
 import HomePage from "./Components/Main/HomePage";
 import TweetDetail from "./Components/Tweet/TweetDetail";
 import Profile from "./Components/Profile";
+import { useParams } from "react-router-dom";
 
 export const userContext = React.createContext();
 
 function App() {
   const [user, setUser] = useState();
-  const username = user?.username;
-
+  let { username } = useParams();
+  console.log("USERNAME:", username);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -50,7 +51,7 @@ function App() {
           />
           <Route path={`/tweet/:username/:tweetId`} element={<TweetDetail />} />
           <Route
-            path={`/${username}`}
+            path="/:username"
             element={user ? <Profile /> : <LoginPage />}
           />
         </Routes>

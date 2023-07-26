@@ -14,20 +14,13 @@ function Sidebar({ handleLogout }) {
   const { user } = useContext(userContext);
   const [active, setActive] = useState("home");
 
-  console.log(active);
-
   const navigate = useNavigate();
   const handleItemClick = (page) => {
     setActive(page);
   };
 
-  const handleLogoutClick = () => {
-    handleLogout();
-    navigate("/auth/login");
-  };
-
   return (
-    <div className="h-screen sticky top-0 flex flex-col justify-between w-72 px-2">
+    <div className="h-screen sticky top-0 flex flex-col justify-between md:w-72 w-32 px-2 ">
       <div>
         <div className="mt-1 mb-4 ml-1 flex items-center justify-center rounded-full w-16 h-16 hover:bg-gray-lightest transform transition-colors duratios-200">
           <SiPostman className="w-12 h-12" />
@@ -43,7 +36,7 @@ function Sidebar({ handleLogout }) {
               >
                 <AiFillHome />
 
-                <span className="ml-4 font-bold">Home</span>
+                <span className="ml-4 font-bold md:block hidden">Home</span>
               </li>
             </Link>
             {user ? (
@@ -58,7 +51,9 @@ function Sidebar({ handleLogout }) {
                 >
                   <GrUserManager />
 
-                  <span className="ml-4 font-bold">Profile</span>
+                  <span className="ml-4 font-bold md:block hidden">
+                    Profile
+                  </span>
                 </li>
               </Link>
             ) : (
@@ -74,13 +69,8 @@ function Sidebar({ handleLogout }) {
         <button className="bg-primary-base text-white rounded-full py-3 px-8 w-11/12 shadow-lg hover:bg-primary-dark transform transition-colors duration-200">
           Tweet
         </button>
-        {user && (
-          <button className="text-red" onClick={handleLogoutClick}>
-            Çıkış Yapıyorum
-          </button>
-        )}
       </div>
-      <UserBox />
+      <UserBox handleLogout={handleLogout} />
     </div>
   );
 }
