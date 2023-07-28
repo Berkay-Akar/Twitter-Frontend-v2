@@ -23,7 +23,9 @@ function Sidebar({ handleLogout }) {
     <div className="h-screen sticky top-0 flex flex-col justify-between md:w-72 w-32 px-2 ">
       <div>
         <div className="mt-1 mb-4 ml-1 flex items-center justify-center rounded-full w-16 h-16 hover:bg-gray-lightest transform transition-colors duratios-200">
-          <SiPostman className="w-12 h-12" />
+          <Link to="/">
+            <SiPostman className="w-12 h-12 cursor-pointer" />
+          </Link>
         </div>
         <nav className="flex-col mb-4 cursor-pointer">
           <ul className="text-xl  block">

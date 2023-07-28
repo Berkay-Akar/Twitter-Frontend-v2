@@ -14,9 +14,23 @@ function FeedItem({ tweet, posts, setPosts }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isRetweeted, setIsRetweeted] = useState(false);
 
-  useEffect(() => {
-    getLikedUserByPost();
-  }, [tweet]);
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/tweets/following",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const updatedPosts = response.data.result;
+
+      setPosts(updatedPosts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   const refetchPosts = async () => {
     try {
@@ -36,25 +50,6 @@ function FeedItem({ tweet, posts, setPosts }) {
     }
   };
 
-  const getLikedUserByPost = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3001/tweets/liked/user/${tweet.id}`,
-        [tweet.id]
-      );
-      const likedUsers = response.data.users;
-      const currentUserID = user.id;
-
-      const currentUserLiked = likedUsers.some((likedUser) => {
-        return likedUser.user_id === currentUserID;
-      });
-
-      setIsLiked(currentUserLiked);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const handleLike = async (e) => {
     e.preventDefault();
 
@@ -69,7 +64,7 @@ function FeedItem({ tweet, posts, setPosts }) {
 
         setPosts(updatedPosts);
         setIsLiked(false); // Update the isLiked state to false
-        refetchPosts();
+        //refetchPosts();
       } catch (error) {
         console.error("Error unliking post:", error);
       }
@@ -81,7 +76,7 @@ function FeedItem({ tweet, posts, setPosts }) {
         );
         setPosts(updatedPosts);
         setIsLiked(true); // Update the isLiked state to true
-        refetchPosts();
+        //refetchPosts();
       } catch (error) {
         console.error("Error liking post:", error);
       }
@@ -161,16 +156,15 @@ function FeedItem({ tweet, posts, setPosts }) {
       className="cursor-pointer"
     >
       <article className="flex flex-col shadow my-4">
-        <div className="flex items-center ">
-          <Link to={`/${tweet?.username}`} rel="noreferrer">
-            <img
-              src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-              alt="Profile"
-              className="w-11 h-11 rounded-full ml-4 object-cover"
-            />
-          </Link>
-
-          <div className="flex  items-center ml-8 ">
+        <div className="flex  items-center justify-between w-full px-4">
+          <div className="flex items-center gap-2">
+            <Link to={`/${tweet?.username}`} rel="noreferrer">
+              <img
+                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                alt="Profile"
+                className="w-11 h-11 rounded-full  object-cover"
+              />
+            </Link>
             <Link to={`/${tweet?.username}`} rel="noreferrer">
               <span className="font-bold text-md text-black-black hover:underline">
                 {tweet?.name ? tweet?.name : "unknown"}
@@ -184,17 +178,16 @@ function FeedItem({ tweet, posts, setPosts }) {
                 {formatTimestamp(tweet.created_at)}
               </span>
             </div>
-            <div className="pl-44">
-              {user.id === tweet.user_id ? (
-                <BsTrash3
-                  onClick={handleDelete}
-                  className="ml-24  text-red-400"
-                />
-              ) : null}
-            </div>
+          </div>
+
+          <div className="">
+            {user.id === tweet.user_id ? (
+              <BsTrash3 onClick={handleDelete} className="  text-red-400" />
+            ) : null}
           </div>
         </div>
-        <div className=" flex items-start justify-between px-24 py-2 bg-white">
+
+        <div className=" flex items-start justify-between px-10 py-2 bg-white">
           <p className="text-md text-black-black break-all">{tweet.content}</p>
         </div>
         <div className="flex flex-row cursor-pointer items-center   justify-around">

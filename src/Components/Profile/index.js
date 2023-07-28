@@ -16,29 +16,37 @@ import {
   DialogFooter,
   Input,
   Textarea,
+  File,
 } from "@material-tailwind/react";
 
 function Profile() {
   const [open, setOpen] = React.useState(false);
+  const { user } = useContext(userContext);
   const { username } = useParams();
   console.log("USERNAME:", username);
+  const [following, setFollowing] = useState(false);
 
   const handleOpen = () => setOpen(!open);
-  const { user } = useContext(userContext);
-  console.log("USER:", user);
+  //const { user } = useContext(userContext);
   const [posts, setPosts] = useState([]);
-  const [posts_user, setPosts_user] = useState(null);
-  console.log("USER:", user);
+
   const date = new Date().toLocaleDateString("tr-TR", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-  const [currentUser, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState();
 
   useEffect(() => {
     fetchUserProfile(username);
-  }, [username]);
+  }, [username]); // Add username to the dependency array to re-run the effect when the username changes
+
+  useEffect(() => {
+    // Call isFollowing function when the currentUser state changes
+    if (currentUser) {
+      isFollowing();
+    }
+  }, [currentUser]);
 
   const fetchUserProfile = async (username) => {
     try {
@@ -50,19 +58,76 @@ function Profile() {
           },
         }
       );
-      console.log("USERNAME:", username);
-      console.log("RESPONSE:", response);
-      const posts = response.data.tweets;
-      setPosts(posts);
-      setPosts_user(response.data.tweets.user_id);
-      setUser(response.data.tweets[0].user);
-      console.log("posts_user:", posts_user);
+
+      const { currentUser, tweets } = response.data;
+
+      setPosts(tweets);
+      setCurrentUser(currentUser);
     } catch (error) {
       console.log(error.response?.data?.error);
     }
   };
 
-  console.log("PROFILE POSTS:", posts);
+  const handleFollow = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/followers/${currentUser.id}`,
+        undefined,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.followedUser) {
+        setFollowing(true);
+      }
+      fetchUserProfile(username);
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+  };
+
+  const handleUnfollow = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.delete(
+        `http://localhost:4000/followers/${currentUser.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.unfollowedUser) {
+        setFollowing(false);
+      }
+      fetchUserProfile(username);
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
+
+  const isFollowing = async () => {
+    try {
+      const followings = await axios.get("http://localhost:4000/followers", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const followers = followings.data.followers;
+      const follows = followers.some(
+        (follower) => follower.followingId === currentUser.id
+      );
+      console.log("follows", follows);
+      console.log("followers", followers);
+      setFollowing(follows);
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+    }
+  };
+  console.log("following", following);
 
   return (
     <div className="">
@@ -88,92 +153,114 @@ function Profile() {
             <div className="flex flex-col gap-2 ">
               <div className="flex justify-between w-full">
                 <h5 className="font-bold text-xl tracking-wider  pt-8 ">
-                  {user?.name}
+                  {currentUser?.name}
                 </h5>
-
                 <>
-                  <Button onClick={handleOpen} className="mr-11 h-10">
-                    Edit Profile
-                  </Button>
-                  <Dialog open={open} handler={handleOpen}>
-                    <div className="flex items-center justify-between">
-                      <DialogHeader>New message to @</DialogHeader>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="mr-3 h-5 w-5"
-                        onClick={handleOpen}
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L10.94 12l-5.47 5.47a.75.75 0 01-1.06-1.06L5.47 5.47a.75.75 0 010-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <DialogBody divider>
-                      <div className="grid gap-6">
-                        <Input label="Username" />
-                        <Textarea label="Message" />
-                      </div>
-                    </DialogBody>
-                    <DialogFooter className="space-x-2">
-                      <Button
-                        variant="outlined"
-                        color="red"
-                        onClick={handleOpen}
-                      >
-                        close
+                  {currentUser?.username === user.username ? (
+                    <>
+                      <Button onClick={handleOpen} className="mr-11 h-10 ">
+                        Edit Profile
                       </Button>
-                      <Button
-                        variant="gradient"
-                        color="green"
-                        onClick={handleOpen}
-                      >
-                        send message
-                      </Button>
-                    </DialogFooter>
-                  </Dialog>
+                      <Dialog open={open} handler={handleOpen}>
+                        <div className="flex items-center justify-between ml-[300px]">
+                          <DialogHeader>Edit Profile</DialogHeader>
+                        </div>
+                        <DialogBody divider>
+                          <div className="grid gap-6">
+                            <Input
+                              onChange={(e) => {
+                                setCurrentUser({
+                                  ...currentUser,
+                                  name: e.target.value,
+                                });
+                              }}
+                              label="Username"
+                            />
+                            <Input
+                              onChange={(e) => {
+                                setCurrentUser({
+                                  ...currentUser,
+                                  description: e.target.value,
+                                });
+                              }}
+                              label="Description"
+                            />
+                            <Input
+                              onChange={(e) => {
+                                setCurrentUser({
+                                  ...currentUser,
+                                  birthday: e.target.value,
+                                });
+                              }}
+                              label="Birthday"
+                            />
+                            <Input
+                              onChange={(e) => {
+                                setCurrentUser({
+                                  ...currentUser,
+                                  profile_picture: e.target.value,
+                                });
+                              }}
+                              label="Profile Picture"
+                            />
+                          </div>
+                        </DialogBody>
+                        <DialogFooter className="space-x-2">
+                          <Button
+                            variant="outlined"
+                            color="red"
+                            onClick={handleOpen}
+                          >
+                            Close
+                          </Button>
+                          <Button
+                            variant="gradient"
+                            color="primary-base"
+                            onClick={handleOpen}
+                          >
+                            Edit
+                          </Button>
+                        </DialogFooter>
+                      </Dialog>
+                    </>
+                  ) : (
+                    <Button
+                      className="mr-11 h-10"
+                      onClick={following ? handleUnfollow : handleFollow}
+                    >
+                      {following ? "Unfollow" : "Follow"}
+                    </Button>
+                  )}
                 </>
               </div>
               <span className="font-semibold text-sm text-gray-dark">
-                @{user?.username}
+                @{currentUser?.username}
               </span>
 
               <span>
-                {user?.description ? user.description : "description"}
+                {currentUser?.description
+                  ? currentUser.description
+                  : "description"}
               </span>
               <span>{date}</span>
               <div className="flex items-center gap-2">
                 <div className="flex gap-1 items-center">
-                  <span>{user?.followers_count} </span>
+                  <span>{currentUser?.followers_count} </span>
                   <span className="font-semibold text-sm text-gray-dark">
                     Followers
                   </span>
                 </div>
                 <div className="flex gap-1 items-center">
-                  <span>{user?.following_count} </span>
+                  <span>{currentUser?.following_count} </span>
                   <span className="font-semibold text-sm text-gray-dark">
                     Following
                   </span>
                 </div>
               </div>
             </div>
-
-            <div>{/* <ProfileTab /> */}</div>
           </div>
           <Divider />
-          {posts.map((post) => (
-            <FeedItem
-              key={post.id}
-              tweet={post}
-              posts={posts}
-              user={user}
-              setPosts={setPosts}
-              fetchUserProfile={fetchUserProfile}
-            />
-          ))}
+          <ProfileTab posts={posts} setPosts={setPosts} />
         </div>
         <div className="flex-auto">
           <Layout />

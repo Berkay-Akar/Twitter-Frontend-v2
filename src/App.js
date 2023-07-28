@@ -6,6 +6,7 @@ import HomePage from "./Components/Main/HomePage";
 import TweetDetail from "./Components/Tweet/TweetDetail";
 import Profile from "./Components/Profile";
 import { useParams } from "react-router-dom";
+import UserBox from "./Components/SideBar/UserBox";
 
 export const userContext = React.createContext();
 

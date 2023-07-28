@@ -13,9 +13,8 @@ function UserBox({ handleLogout }) {
   const handleLogoutClick = () => {
     handleLogout();
     console.log("LOGOUT");
-    navigate("/auth/login");
+    navigate("/");
   };
-  console.log(typeof handleLogout);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
